@@ -1,0 +1,1 @@
+//Streamlined passport middleware for cleaner usage in routes.
