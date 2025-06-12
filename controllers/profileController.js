@@ -1,0 +1,42 @@
+import { PrismaClient } from "@prisma/client";
+import fs from "fs";
+import path from "path";
+
+const prisma = new PrismaClient();
+
+export const updateProfile = async (req, res) => {
+    const {bio, interests} = req.body;
+
+    try {
+        const user = await prisma.user.update({
+            where: {id: req.user.id},
+            data: {
+                bio,
+                interests: interests.split(',').map((i) => i.trim()),
+            },
+        });
+
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({err: "Failed to update profile"});
+    }
+};
+
+export const uploadAvatar = async (req,res) => {
+    if (!req.file) return res.status(400).json({err: "No file uploaded"});
+
+    const filePath = `/uploads/${req.file.filename}`;
+
+    try {
+        const user = await prisma.user.update({
+            where: {id: req.user.id},
+            data: {avatarUrl: filePath},
+        });
+
+        res.json({avatarUrl: user.avatarUrl});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({err: "Failed to upload avatar"});
+    }
+};
