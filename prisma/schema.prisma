@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  password         String
+  name             String?
+  avatarUrl        String?
+  bio              String?
+  interests        String[]
+  friends          User[]          @relation("UserFriends")
+  friendOf         User[]          @relation("UserFriends")
+  sentRequests     FriendRequest[] @relation("RequestSender")
+  receivedRequests FriendRequest[] @relation("RequestReceiver")
+  sentMessages     Message[]       @relation("MessageSender")
+  messages         Message[]       @relation("UserMessages")
+  comments         Comment[]
+  reactions        Reaction[]
+}
+
+model FriendRequest {
+  id        String   @id @default(uuid())
+  fromId    String
+  toId      String
+  from      User     @relation("RequestSender", fields: [fromId], references: [id])
+  to        User     @relation("RequestReceiver", fields: [toId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id           String       @id @default(uuid())
+  content      String
+  senderId     String
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id])
+  participants User[]       @relation("UserMessages")
+  createdAt    DateTime     @default(now())
+  readBy       String[]
+  attachments  Attachment[]
+  comments     Comment[]
+  reactions    Reaction[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id         String   @id @default(uuid())
+  filename   String
+  mimetype   String
+  size       Int
+  path       String
+  messageId  String
+  message    Message  @relation(fields: [messageId], references: [id])
+  uploadedAt DateTime @default(now())
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  emoji     String
+  userId    String
+  messageId String
+  user      User     @relation(fields: [userId], references: [id])
+  message   Message  @relation(fields: [messageId], references: [id])
+  createdAt DateTime @default(now())
+}

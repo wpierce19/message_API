@@ -30,7 +30,7 @@ export const requestFriend = async (req,res) => {
     }
 };
 
-export const getRequest = async (req,res) => {
+export const getRequests = async (req,res) => {
     try {
         const requests = await prisma.friendRequest.findMany({
             where: {toId: req.user.id},

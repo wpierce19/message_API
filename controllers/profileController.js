@@ -4,6 +4,26 @@ import path from "path";
 
 const prisma = new PrismaClient();
 
+export const getProfile = async (req,res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {id: req.user.id},
+            select: {
+                id: true,
+                email: true,
+                avatarUrl: true,
+                bio: true,
+                interests: true,
+            },
+        });
+
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({err: "Failed to fetch Profile"});
+    }
+};
+
 export const updateProfile = async (req, res) => {
     const {bio, interests} = req.body;
 
