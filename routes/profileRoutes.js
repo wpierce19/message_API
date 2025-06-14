@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import protect from "../middleware/protect.js";
-import { getProfile, updateProfile, uploadAvatar, deleteAvatar, getPublicProfile } from "../controllers/profileController";
+import { getProfile, updateProfile, uploadAvatar, deleteAvatar, getPublicProfile } from "../controllers/profileController.js";
 
 const upload = multer({dest: "uploads/"});
 const profileRouter = Router();

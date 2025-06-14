@@ -60,3 +60,45 @@ export const uploadAvatar = async (req,res) => {
         res.status(500).json({err: "Failed to upload avatar"});
     }
 };
+
+export const deleteAvatar = async (req,res) => {
+    try {
+        const user = await prisma.user.findUnique({where: {id: req.user.id}});
+        if (user?.avatarUrl){
+            const filePath = path.join("public", user.avatarUrl);
+            fs.unlink(filePath, (err) => {
+                if (err) console.warn("Could not delete file:", filePath);
+            });
+        }
+
+        await prisma.user.update({
+            where: {id: req.user.id},
+            data: {avatarUrl: true},
+        });
+
+        res.json({msg: "Avatar deleted"});
+    } catch (err) {
+        res.status(500).json({err: "Failed to delete avatar"});
+    }
+};
+
+export const getPublicProfile = async (req,res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {id: req.params.id},
+            select: {
+                id: true,
+                email: true,
+                avatarUrl: true,
+                bio: true,
+                interests: true,
+            },
+        });
+
+        if (!user) return res.status(404).json({err: "User not found"});
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({err: "Failed to fetch public profile"});
+    }
+};

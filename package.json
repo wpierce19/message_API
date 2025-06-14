@@ -1,6 +1,7 @@
 {
   "name": "message_api",
   "version": "1.0.0",
+  "type": "module",
   "description": "API for the Messaging Application",
   "main": "index.js",
   "scripts": {
