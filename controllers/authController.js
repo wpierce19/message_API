@@ -32,7 +32,7 @@ export const signup = async (req, res) => {
         const token = generateToken(user);
         res.json({token});
     } catch (err) {
-        console.error(err);
+        console.error("Signup error: ",err);
         res.status(500).json({err: 'Server error during signup'})
     }
 };

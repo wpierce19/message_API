@@ -10,6 +10,7 @@ export const getProfile = async (req,res) => {
             where: {id: req.user.id},
             select: {
                 id: true,
+                username: true,
                 email: true,
                 avatarUrl: true,
                 bio: true,
@@ -88,6 +89,7 @@ export const getPublicProfile = async (req,res) => {
             where: {id: req.params.id},
             select: {
                 id: true,
+                username: true,
                 email: true,
                 avatarUrl: true,
                 bio: true,
