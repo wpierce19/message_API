@@ -61,8 +61,9 @@ export const getMe = async (req,res) => {
             where: {id: req.user.id},
             select: {
                 id: true,
+                username: true,
                 email: true,
-                avatarUrl: true,
+                avatarUrl: null,
                 bio: true,
                 interests: true,
             },

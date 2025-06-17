@@ -74,7 +74,7 @@ export const deleteAvatar = async (req,res) => {
 
         await prisma.user.update({
             where: {id: req.user.id},
-            data: {avatarUrl: true},
+            data: {avatarUrl: null},
         });
 
         res.json({msg: "Avatar deleted"});
@@ -91,7 +91,7 @@ export const getPublicProfile = async (req,res) => {
                 id: true,
                 username: true,
                 email: true,
-                avatarUrl: true,
+                avatarUrl: null,
                 bio: true,
                 interests: true,
             },
