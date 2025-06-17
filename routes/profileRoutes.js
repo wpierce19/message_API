@@ -1,15 +1,21 @@
 import { Router } from "express";
 import multer from "multer";
 import protect from "../middleware/protect.js";
-import { getProfile, updateProfile, uploadAvatar, deleteAvatar, getPublicProfile } from "../controllers/profileController.js";
+import {
+  getProfile,
+  updateProfile,
+  uploadAvatar,
+  deleteAvatar,
+  getPublicProfile,
+} from "../controllers/profileController.js";
 
-const upload = multer({dest: "uploads/"});
+const upload = multer({ dest: "uploads/" });
 const profileRouter = Router();
 
-profileRouter.get("/profile", protect, getProfile);
-profileRouter.put("/profile", protect, updateProfile);
+profileRouter.get("/", protect, getProfile);                  // GET /api/profile
+profileRouter.put("/", protect, updateProfile);              // PUT /api/profile
 profileRouter.post("/avatar", protect, upload.single("avatar"), uploadAvatar);
-profileRouter.delete("/avatar", profileRouter, deleteAvatar);
-profileRouter.get("/profile/:id", protect, getPublicProfile);
+profileRouter.delete("/avatar", protect, deleteAvatar);
+profileRouter.get("/:id", protect, getPublicProfile);        // GET /api/profile/:id
 
 export default profileRouter;

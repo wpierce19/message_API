@@ -1,21 +1,22 @@
 import { Router } from "express";
 import protect from "../middleware/protect.js";
 import {
-    getFriends,
-    requestFriend,
-    getRequests,
-    acceptFriend,
-    denyFriend,
-    removeFriend
+  getFriends,
+  requestFriend,
+  getRequests,
+  acceptFriend,
+  denyFriend,
+  removeFriend
 } from "../controllers/friendController.js";
 
 const friendRouter = Router();
 
-friendRouter.get("/friends", protect, getFriends);
-friendRouter.post("/friends/request/:id", protect, requestFriend);
-friendRouter.get("/friends/requests", protect, getRequests);
-friendRouter.post("/friends/accept/:id", protect, acceptFriend);
-friendRouter.post("/friends/deny/:id", protect, denyFriend);
-friendRouter.delete("/friends/:id", protect, removeFriend);
+// These will be prefixed with /api/friends
+friendRouter.get("/", protect, getFriends);
+friendRouter.post("/request/:id", protect, requestFriend);
+friendRouter.get("/requests", protect, getRequests);
+friendRouter.post("/accept/:id", protect, acceptFriend);
+friendRouter.post("/deny/:id", protect, denyFriend);
+friendRouter.delete("/:id", protect, removeFriend);
 
 export default friendRouter;
