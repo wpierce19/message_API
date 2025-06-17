@@ -63,7 +63,7 @@ export const getMe = async (req,res) => {
                 id: true,
                 username: true,
                 email: true,
-                avatarUrl: null,
+                avatarUrl: true,
                 bio: true,
                 interests: true,
             },
