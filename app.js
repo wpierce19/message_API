@@ -2,8 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import path from 'path';
 import routes from "./routes/index.js";
+import fs from "fs";
 import passportConfig from "./middleware/passportConfig.js";
 
 dotenv.config();
