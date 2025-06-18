@@ -8,6 +8,12 @@ import passportConfig from "./middleware/passportConfig.js";
 
 dotenv.config();
 
+// Ensure persistent uploads folder exists
+const uploadDir = "/mnt/data/uploads";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passportConfig.initialize());
-app.use("/uploads", express.static(resolve(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join("/mnt/data/uploads")));
 
 //Routes
 app.use(routes);

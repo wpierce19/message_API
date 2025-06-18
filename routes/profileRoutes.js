@@ -9,7 +9,9 @@ import {
   getPublicProfile,
 } from "../controllers/profileController.js";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+  dest: path.join("/mnt/data/uploads"),
+});
 const profileRouter = Router();
 
 profileRouter.get("/", protect, getProfile);                  // GET /api/profile
