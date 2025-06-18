@@ -4,6 +4,6 @@ import { searchUsers } from "../controllers/userController.js";
 
 const userRouter = Router();
 
-userRouter.get("/users/search", protect, searchUsers);
+userRouter.get("/search", protect, searchUsers);
 
 export default userRouter;
