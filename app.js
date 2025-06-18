@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passportConfig.initialize());
-app.use("/uploads", express.static("/mnt/data/uploads"));
+app.use("/uploads", express.static(resolve(__dirname, "uploads")));
 
 //Routes
 app.use(routes);
