@@ -30,6 +30,7 @@ export const getMessages = async (req, res) => {
       currentUserId: userId,
     }));
 
+    console.log("Enriched Messages:", enrichedMessages);
     res.json(enrichedMessages);
   } catch (err) {
     console.error(err);
