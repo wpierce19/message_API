@@ -14,14 +14,14 @@ export const searchUsers = async (req,res) => {
             },
             select: {
                 id: true,
-                name: true,
+                username: true,
                 email: true,
                 avatarUrl: true,
             },
         });
         //Allows for fuzzy matching users search query
         const fuse = new Fuse(allUsers, {
-            keys: ['name', 'email'],
+            keys: ['username', 'email'],
             threshold: 0.3,
         });
 
