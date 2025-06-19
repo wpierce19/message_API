@@ -3,26 +3,38 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const getMessages = async (req, res) => {
-    try {
-        const messages = await prisma.message.findMany({
-            where: {
-                participants: {
-                    some: {id: req.user.id},
-                },
-            },
-            include: {
-                sender: true,
-                comments: true,
-                attachments: true,
-            },
-            orderBy: {createdAt: 'desc'},
-        });
-        
-        res.json(messages);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({err: "Failed to fetch messages"});
-    }
+  try {
+    const userId = req.user.id;
+
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId },
+          { participants: { some: { id: userId } } }
+        ]
+      },
+      include: {
+        sender: {
+          select: { id: true, username: true, email: true }
+        },
+        participants: {
+          select: { id: true, username: true, email: true }
+        },
+        attachments: true,
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    const enrichedMessages = messages.map((msg) => ({
+      ...msg,
+      currentUserId: userId,
+    }));
+
+    res.json(enrichedMessages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Failed to load messages" });
+  }
 };
 
 export const createMessage = async (req, res) => {
