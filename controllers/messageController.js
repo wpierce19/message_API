@@ -30,15 +30,14 @@ export const createMessage = async (req, res) => {
     const { content, recipientId } = req.body;
     const file = req.file;
 
+    const participantIds = [req.user.id, recipientId].filter(Boolean);
+
     const message = await prisma.message.create({
       data: {
         content,
         senderId: req.user.id,
         participants: {
-          connect: [
-            { id: req.user.id },
-            { id: recipientId },
-          ],
+          connect: participantIds.map((id) => ({ id })),
         },
         attachments: file
           ? {
