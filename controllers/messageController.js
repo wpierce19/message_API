@@ -40,18 +40,20 @@ export const getMessages = async (req, res) => {
 
 export const createMessage = async (req, res) => {
   try {
-    const { content, recipientId } = req.body;
+    const { content, recipientId, parentId } = req.body;
     const file = req.file;
-
-    const participantIds = [req.user.id, recipientId].filter(Boolean);
 
     const message = await prisma.message.create({
       data: {
         content,
         senderId: req.user.id,
         participants: {
-          connect: participantIds.map((id) => ({ id })),
+          connect: [
+            { id: req.user.id },
+            { id: recipientId },
+          ],
         },
+        parent: parentId ? { connect: { id: parentId } } : undefined,
         attachments: file
           ? {
               create: {
@@ -79,15 +81,14 @@ export const getMessage = async (req, res) => {
       include: {
         sender: true,
         participants: true,
-        comments: { include: { sender: true } },
         attachments: true,
+        comments: { include: { sender: true } },
         replies: {
           include: {
             sender: true,
             attachments: true,
-            comments: true,
           },
-          orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: "asc" }
         },
       },
     });

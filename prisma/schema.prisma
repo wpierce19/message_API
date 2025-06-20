@@ -46,6 +46,9 @@ model Message {
   attachments  Attachment[]
   comments     Comment[]
   reactions    Reaction[]
+  parentId     String?      
+  parent       Message?     @relation("ThreadReplies", fields: [parentId], references: [id])
+  replies      Message[]    @relation("ThreadReplies")
 }
 
 model Comment {
