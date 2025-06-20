@@ -72,23 +72,31 @@ export const createMessage = async (req, res) => {
   }
 };
 
-export const getMessage = async (req,res) => {
-    try {
-        const message = await prisma.message.findUnique({
-            where: {id: req.params.id},
-            include: {
-                sender: true,
-                participants: true,
-                comments: {include: {sender:true}},
-                attachments: true,
-            },
-        });
+export const getMessage = async (req, res) => {
+  try {
+    const message = await prisma.message.findUnique({
+      where: { id: req.params.id },
+      include: {
+        sender: true,
+        participants: true,
+        comments: { include: { sender: true } },
+        attachments: true,
+        replies: {
+          include: {
+            sender: true,
+            attachments: true,
+            comments: true,
+          },
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
 
-        res.json(message);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({err: "Failed to fetch message thread"});
-    }
+    res.json(message);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Failed to fetch message thread" });
+  }
 };
 
 export const markAsRead = async (req,res) => {
