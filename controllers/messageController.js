@@ -101,85 +101,46 @@ export const getMessage = async (req, res) => {
       where: { id: req.params.id },
       include: {
         sender: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            avatarUrl: true,
-          },
+          select: { id: true, username: true, email: true, avatarUrl: true }
         },
         participants: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            avatarUrl: true,
-          },
+          select: { id: true, username: true, email: true, avatarUrl: true }
         },
         comments: {
           include: {
             sender: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                avatarUrl: true,
-              },
-            },
-          },
+              select: { id: true, username: true, email: true, avatarUrl: true }
+            }
+          }
         },
         attachments: true,
         reactions: {
           include: {
             user: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                avatarUrl: true,
-              },
-            },
-          },
+              select: { id: true, username: true, email: true, avatarUrl: true }
+            }
+          }
         },
-      },
-    });
-
-    if (!message) return res.status(404).json({ err: "Message not found" });
-
-    const thread = await prisma.message.findMany({
-      where: { parentId: message.id },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            avatarUrl: true,
-          },
-        },
-        attachments: true,
-        reactions: {
+        replies: {
           include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                avatarUrl: true,
-              },
+            sender: {
+              select: { id: true, username: true, email: true, avatarUrl: true }
             },
+            attachments: true,
+            comments: true
           },
-        },
-      },
-      orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: "asc" }
+        }
+      }
     });
 
-    res.json({ message, thread });
+    res.json({ message, thread: message.replies || [] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ err: "Failed to fetch message thread" });
   }
 };
+
 
 export const markAsRead = async (req,res) => {
     try {
