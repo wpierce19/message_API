@@ -21,6 +21,15 @@ export const getMessages = async (req, res) => {
           select: { id: true, username: true, email: true }
         },
         attachments: true,
+        reactions: {
+          include: {
+            user: {
+              select: {
+                username: true
+              }
+            }
+          }
+        }
       },
       orderBy: { createdAt: "desc" }
     });
@@ -30,7 +39,6 @@ export const getMessages = async (req, res) => {
       currentUserId: userId,
     }));
 
-    console.log("Enriched Messages:", enrichedMessages);
     res.json(enrichedMessages);
   } catch (err) {
     console.error(err);
@@ -81,15 +89,17 @@ export const getMessage = async (req, res) => {
       include: {
         sender: true,
         participants: true,
-        attachments: true,
         comments: { include: { sender: true } },
-        replies: {
+        attachments: true,
+        reactions: {
           include: {
-            sender: true,
-            attachments: true,
-          },
-          orderBy: { createdAt: "asc" }
-        },
+            user: {
+              select: {
+                username: true
+              }
+            }
+          }
+        }
       },
     });
 
@@ -137,21 +147,32 @@ export const addReply = async (req,res) => {
     }
 };
 
-export const reactToMessage = async (req,res) => {
-    try {
-        const {emoji} = req.body;
+export const reactToMessage = async (req, res) => {
+  const { id: messageId } = req.params;
+  const { emoji } = req.body;
+  const userId = req.user.id;
 
-        const reaction = await prisma.reaction.create({
-            data: {
-                emoji,
-                userId: req.user.id,
-                messageId: req.params.id,
-            },
-        });
+  try {
+    // Delete existing reaction from user on this message
+    await prisma.reaction.deleteMany({
+      where: { userId, messageId },
+    });
 
-        res.json(reaction);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({err: "Failed to post reaction"});
-    }
+    // Add new reaction
+    const newReaction = await prisma.reaction.create({
+      data: {
+        emoji,
+        userId,
+        messageId,
+      },
+      include: {
+        user: { select: { username: true } },
+      },
+    });
+
+    res.json(newReaction);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Failed to react to message" });
+  }
 };
