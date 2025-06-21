@@ -19,6 +19,7 @@ messageRouter.post("/", protect, upload.single("attachment"), createMessage);
 messageRouter.get("/:id", protect, getMessage);
 messageRouter.patch("/:id/read", protect, markAsRead);
 messageRouter.post("/:id/reply", protect, addReply);
-messageRouter.post("/:id/react/:commentId?", protect, reactToMessage);
+messageRouter.post("/:id/react", protect, reactToMessage);
+messageRouter.post("/:id/react/:commentId", protect, reactToMessage);
 
 export default messageRouter;
