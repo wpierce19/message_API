@@ -160,23 +160,33 @@ export const markAsRead = async (req,res) => {
     }
 };
 
-export const addReply = async (req,res) => {
-    try {
-        const {content} = req.body;
+export const addReply = async (req, res) => {
+  try {
+    const { content } = req.body;
 
-        const comment = await prisma.comment.create({
-            data: {
-                content,
-                messageId: req.params.id,
-                senderId: req.user.id,
-            },
-        });
+    const comment = await prisma.comment.create({
+      data: {
+        content,
+        messageId: req.params.id,
+        senderId: req.user.id,
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
 
-        res.json(comment);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({err: "Failed to post comment"});
-    }
+    res.json(comment);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Failed to post comment" });
+  }
 };
 
 export const reactToMessage = async (req, res) => {
