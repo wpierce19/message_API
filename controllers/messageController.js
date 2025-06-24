@@ -217,32 +217,66 @@ export const reactToMessage = async (req, res) => {
 
   try {
     if (commentId) {
-      console.log("Reacting to comment:", commentId);
+      // Fetch the comment to check the sender
+      const comment = await prisma.comment.findUnique({
+        where: { id: commentId },
+        select: { senderId: true }
+      });
+
+      if (!comment) {
+        return res.status(404).json({ err: "Comment not found" });
+      }
+
+      if (comment.senderId === userId) {
+        return res.status(403).json({ err: "You cannot react to your own comment" });
+      }
+
       await prisma.reaction.deleteMany({ where: { userId, commentId } });
 
       const newReaction = await prisma.reaction.create({
-        data: { emoji, userId, commentId },
-        include: {
-          user: { select: { username: true } },
+        data: {
+          emoji,
+          userId,
+          commentId
         },
+        include: {
+          user: { select: { username: true } }
+        }
       });
 
       return res.json(newReaction);
     }
 
-    console.log("Reacting to message:", messageId);
+    // Reacting to the main message
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+      select: { senderId: true }
+    });
+
+    if (!message) {
+      return res.status(404).json({ err: "Message not found" });
+    }
+
+    if (message.senderId === userId) {
+      return res.status(403).json({ err: "You cannot react to your own message" });
+    }
+
     await prisma.reaction.deleteMany({ where: { userId, messageId } });
 
     const newReaction = await prisma.reaction.create({
-      data: { emoji, userId, messageId },
-      include: {
-        user: { select: { username: true } },
+      data: {
+        emoji,
+        userId,
+        messageId
       },
+      include: {
+        user: { select: { username: true } }
+      }
     });
 
     res.json(newReaction);
   } catch (err) {
-    console.error("❌ reactToMessage failed:", err);
+    console.error(err);
     res.status(500).json({ err: "Failed to react" });
   }
 };
