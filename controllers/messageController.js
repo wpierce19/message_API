@@ -196,17 +196,11 @@ export const reactToMessage = async (req, res) => {
 
   try {
     if (commentId) {
-      // Reacting to a comment
-      await prisma.reaction.deleteMany({
-        where: { userId, commentId },
-      });
+      console.log("Reacting to comment:", commentId);
+      await prisma.reaction.deleteMany({ where: { userId, commentId } });
 
       const newReaction = await prisma.reaction.create({
-        data: {
-          emoji,
-          userId,
-          commentId,
-        },
+        data: { emoji, userId, commentId },
         include: {
           user: { select: { username: true } },
         },
@@ -215,17 +209,11 @@ export const reactToMessage = async (req, res) => {
       return res.json(newReaction);
     }
 
-    // Reacting to the message itself
-    await prisma.reaction.deleteMany({
-      where: { userId, messageId },
-    });
+    console.log("Reacting to message:", messageId);
+    await prisma.reaction.deleteMany({ where: { userId, messageId } });
 
     const newReaction = await prisma.reaction.create({
-      data: {
-        emoji,
-        userId,
-        messageId,
-      },
+      data: { emoji, userId, messageId },
       include: {
         user: { select: { username: true } },
       },
@@ -233,7 +221,7 @@ export const reactToMessage = async (req, res) => {
 
     res.json(newReaction);
   } catch (err) {
-    console.error(err);
+    console.error("❌ reactToMessage failed:", err);
     res.status(500).json({ err: "Failed to react" });
   }
 };

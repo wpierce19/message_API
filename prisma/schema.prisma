@@ -46,19 +46,20 @@ model Message {
   attachments  Attachment[]
   comments     Comment[]
   reactions    Reaction[]
-  parentId     String?      
+  parentId     String?
   parent       Message?     @relation("ThreadReplies", fields: [parentId], references: [id])
   replies      Message[]    @relation("ThreadReplies")
 }
 
 model Comment {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   content   String
   senderId  String
-  sender    User     @relation(fields: [senderId], references: [id])
+  sender    User       @relation(fields: [senderId], references: [id])
   messageId String
-  message   Message  @relation(fields: [messageId], references: [id])
-  createdAt DateTime @default(now())
+  message   Message    @relation(fields: [messageId], references: [id])
+  createdAt DateTime   @default(now())
+  reactions Reaction[]
 }
 
 model Attachment {
@@ -76,8 +77,13 @@ model Reaction {
   id        String   @id @default(uuid())
   emoji     String
   userId    String
-  messageId String
   user      User     @relation(fields: [userId], references: [id])
-  message   Message  @relation(fields: [messageId], references: [id])
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id])
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id])
   createdAt DateTime @default(now())
+
+  @@unique([userId, messageId])
+  @@unique([userId, commentId])
 }
