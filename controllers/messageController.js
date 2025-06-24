@@ -97,6 +97,8 @@ export const createMessage = async (req, res) => {
 
 export const getMessage = async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const message = await prisma.message.findUnique({
       where: { id: req.params.id },
       include: {
@@ -110,6 +112,14 @@ export const getMessage = async (req, res) => {
           include: {
             sender: {
               select: { id: true, username: true, email: true, avatarUrl: true }
+            },
+            reactions: {
+              where: { userId },
+              include: {
+                user: {
+                  select: { id: true, username: true }
+                }
+              }
             }
           }
         },
@@ -134,7 +144,18 @@ export const getMessage = async (req, res) => {
       }
     });
 
-    res.json({ message, thread: message.replies || [] });
+    // Normalize each comment to surface single reaction (if any)
+    const normalizedComments = message.comments.map((c) => ({
+      ...c,
+      reaction: c.reactions[0] || null
+    }));
+
+    const cleanedMessage = {
+      ...message,
+      comments: normalizedComments
+    };
+
+    res.json({ message: cleanedMessage, thread: message.replies || [] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ err: "Failed to fetch message thread" });
