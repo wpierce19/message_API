@@ -10,7 +10,9 @@ import {
   reactToMessage
 } from "../controllers/messageController.js";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+  dest: path.join("/mnt/data/uploads"),
+});
 const messageRouter = Router();
 
 // These will be under /api/messages
