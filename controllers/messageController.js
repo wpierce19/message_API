@@ -81,7 +81,7 @@ export const createMessage = async (req, res) => {
                 filename: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                path: file.path,
+                path: `/uploads/${file.filename}`,
               },
             }
           : undefined,
