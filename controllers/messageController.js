@@ -63,6 +63,8 @@ export const createMessage = async (req, res) => {
   try {
     const { content, recipientId, parentId } = req.body;
     const file = req.file;
+    const filePath = `/uploads/${req.file.filename}`;
+    console.log(file);
 
     const message = await prisma.message.create({
       data: {
@@ -81,7 +83,7 @@ export const createMessage = async (req, res) => {
                 filename: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                path: `/uploads/${file.filename}`,
+                path: filePath,
               },
             }
           : undefined,
