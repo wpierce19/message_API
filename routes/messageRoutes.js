@@ -12,9 +12,7 @@ import {
   uploadQuillImage
 } from "../controllers/messageController.js";
 
-const upload = multer({
-  dest: path.join("/mnt/data/uploads"),
-});
+const upload = multer();
 const messageRouter = Router();
 
 // These will be under /api/messages
