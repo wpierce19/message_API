@@ -13,6 +13,8 @@ const storage = multer.diskStorage({
   },
 });
 
+const upload = multer({ storage });
+
 export const getMessages = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -72,29 +74,18 @@ export const getMessages = async (req, res) => {
 
 export const createMessage = async (req, res) => {
   try {
-    const { content, recipientId, recipientEmail, parentId } = req.body;
+    const { content, recipientId, parentId } = req.body;
 
-    let recipient = recipientId;
+    //Validate recipientId exists
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientId },
+    });
 
-    // If recipientId is not provided, try to resolve using recipientEmail
-    if (!recipient && recipientEmail) {
-      const user = await prisma.user.findUnique({
-        where: { email: recipientEmail },
-        select: { id: true }
-      });
-
-      if (!user) {
-        return res.status(404).json({ err: "Recipient not found" });
-      }
-
-      recipient = user.id;
-    }
-
-    // Validate recipient existence
     if (!recipient) {
-      return res.status(400).json({ err: "Recipient ID or email is required" });
+      return res.status(400).json({ err: "Recipient not found" });
     }
 
+    //Create message with both sender and recipient connected
     const message = await prisma.message.create({
       data: {
         content,
@@ -102,7 +93,7 @@ export const createMessage = async (req, res) => {
         participants: {
           connect: [
             { id: req.user.id },
-            { id: recipient },
+            { id: recipientId },
           ],
         },
         parent: parentId ? { connect: { id: parentId } } : undefined,
@@ -115,7 +106,6 @@ export const createMessage = async (req, res) => {
     res.status(500).json({ err: "Failed to create message" });
   }
 };
-const upload = multer({ storage });
 
 //For support with quill image handling from frontend
 export const uploadQuillImage = async (req, res) => {
