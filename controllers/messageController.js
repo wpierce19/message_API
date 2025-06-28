@@ -98,17 +98,14 @@ export const createMessage = async (req, res) => {
 const upload = multer({ storage });
 
 //For support with quill image handling from frontend
-export const uploadQuillImage = [
-  upload.single("image"),
-  async (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ err: "No file uploaded" });
-    }
+export const uploadQuillImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ err: "No file uploaded" });
+  }
 
-    const filePath = `/uploads/${req.file.filename}`;
-    res.status(200).json({ url: filePath });
-  },
-];
+  const filePath = `/uploads/${req.file.filename}`;
+  return res.status(200).json({ url: filePath });
+};
 
 export const getMessage = async (req, res) => {
   try {
