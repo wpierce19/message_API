@@ -62,9 +62,6 @@ export const getMessages = async (req, res) => {
 export const createMessage = async (req, res) => {
   try {
     const { content, recipientId, parentId } = req.body;
-    const file = req.file;
-    const filePath = `/uploads/${req.file.filename}`;
-    console.log(file);
 
     const message = await prisma.message.create({
       data: {
@@ -77,16 +74,6 @@ export const createMessage = async (req, res) => {
           ],
         },
         parent: parentId ? { connect: { id: parentId } } : undefined,
-        attachments: file
-          ? {
-              create: {
-                filename: file.originalname,
-                mimetype: file.mimetype,
-                size: file.size,
-                path: filePath,
-              },
-            }
-          : undefined,
       },
     });
 
@@ -94,6 +81,19 @@ export const createMessage = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ err: "Failed to create message" });
+  }
+};
+
+//For support with quill image handling from frontend
+export const uploadEditorImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ err: "No image uploaded" });
+
+    const filePath = `/uploads/${req.file.filename}`;
+    res.json({ url: filePath });
+  } catch (err) {
+    console.error("Failed to upload image:", err);
+    res.status(500).json({ err: "Image upload failed" });
   }
 };
 

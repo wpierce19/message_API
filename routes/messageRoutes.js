@@ -8,7 +8,8 @@ import {
   getMessage,
   markAsRead,
   addReply,
-  reactToMessage
+  reactToMessage,
+  uploadEditorImage
 } from "../controllers/messageController.js";
 
 const upload = multer({
@@ -18,7 +19,8 @@ const messageRouter = Router();
 
 // These will be under /api/messages
 messageRouter.get("/", protect, getMessages);
-messageRouter.post("/", protect, upload.single("attachment"), createMessage);
+messageRouter.post("/", protect, createMessage);
+messageRouter.post("/upload-image",protect,upload.single("image"),uploadEditorImage);
 messageRouter.get("/:id", protect, getMessage);
 messageRouter.patch("/:id/read", protect, markAsRead);
 messageRouter.post("/:id/reply", protect, addReply);
