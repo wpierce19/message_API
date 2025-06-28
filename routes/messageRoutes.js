@@ -9,7 +9,7 @@ import {
   markAsRead,
   addReply,
   reactToMessage,
-  uploadEditorImage
+  uploadQuillImage
 } from "../controllers/messageController.js";
 
 const upload = multer({
@@ -20,7 +20,7 @@ const messageRouter = Router();
 // These will be under /api/messages
 messageRouter.get("/", protect, getMessages);
 messageRouter.post("/", protect, createMessage);
-messageRouter.post("/upload-image",protect,upload.single("image"),uploadEditorImage);
+messageRouter.post("/image", upload.single("image"), uploadQuillImage);
 messageRouter.get("/:id", protect, getMessage);
 messageRouter.patch("/:id/read", protect, markAsRead);
 messageRouter.post("/:id/reply", protect, addReply);

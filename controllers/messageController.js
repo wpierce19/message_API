@@ -1,6 +1,17 @@
 import { PrismaClient } from "@prisma/client";
+import multer from "multer";
+import path from "path";
 
 const prisma = new PrismaClient();
+
+// Configure Multer for image uploads
+const storage = multer.diskStorage({
+  destination: "/mnt/data/uploads",
+  filename: (_, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  },
+});
 
 export const getMessages = async (req, res) => {
   try {
@@ -84,18 +95,20 @@ export const createMessage = async (req, res) => {
   }
 };
 
+const upload = multer({ storage });
+
 //For support with quill image handling from frontend
-export const uploadEditorImage = async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ err: "No image uploaded" });
+export const uploadQuillImage = [
+  upload.single("image"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ err: "No file uploaded" });
+    }
 
     const filePath = `/uploads/${req.file.filename}`;
-    res.json({ url: filePath });
-  } catch (err) {
-    console.error("Failed to upload image:", err);
-    res.status(500).json({ err: "Image upload failed" });
-  }
-};
+    res.status(200).json({ url: filePath });
+  },
+];
 
 export const getMessage = async (req, res) => {
   try {
