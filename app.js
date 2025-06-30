@@ -23,7 +23,7 @@ const __dirname = dirname(__filename);
 
 //Middleware
 app.use(cors({
-  origin: ["https://message-application-frontend.pages.dev","http://localhost:5173"],
+  origin: ["https://28fb74f3.message-application-frontend.pages.dev","http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
   credentials: true,
 }));
