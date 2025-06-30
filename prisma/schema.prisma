@@ -59,6 +59,7 @@ model Comment {
   messageId String
   message   Message    @relation(fields: [messageId], references: [id])
   createdAt DateTime   @default(now())
+  imageUrl  String?
   reactions Reaction[]
 }
 

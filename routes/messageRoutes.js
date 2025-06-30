@@ -9,10 +9,11 @@ import {
   markAsRead,
   addReply,
   reactToMessage,
-  uploadQuillImage
+  uploadQuillImage,
+  upload
 } from "../controllers/messageController.js";
 
-const upload = multer();
+
 const messageRouter = Router();
 
 // These will be under /api/messages

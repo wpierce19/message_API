@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+export const upload = multer({ storage });
 
 export const getMessages = async (req, res) => {
   try {
@@ -205,13 +205,23 @@ export const markAsRead = async (req,res) => {
 
 export const addReply = async (req, res) => {
   try {
+    // Run multer manually in async/await style
+    await new Promise((resolve, reject) => {
+      upload.single("image")(req, res, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
     const { content } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const comment = await prisma.comment.create({
       data: {
         content,
         messageId: req.params.id,
         senderId: req.user.id,
+        imageUrl,
       },
       include: {
         sender: {
@@ -227,7 +237,7 @@ export const addReply = async (req, res) => {
 
     res.json(comment);
   } catch (err) {
-    console.error(err);
+    console.error("Failed to post comment:", err);
     res.status(500).json({ err: "Failed to post comment" });
   }
 };
